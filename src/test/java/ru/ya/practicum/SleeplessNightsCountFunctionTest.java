@@ -96,4 +96,61 @@ public class SleeplessNightsCountFunctionTest {
 
         assertEquals(LocalDate.of(2024, 3, 4), session.getSleepNightDate());
     }
+
+    @Test
+    public void shouldAssignSleepAfterNoonToSameNightDate() {
+        LocalDateTime start = LocalDateTime.of(2024, 3, 5, 12, 1);
+        LocalDateTime end = start.plusHours(1);
+
+        SleepingSession session = new SleepingSession(start, end, SleepQuality.GOOD);
+
+        assertEquals(LocalDate.of(2024, 3, 5), session.getSleepNightDate());
+    }
+
+    @Test
+    public void shouldNotCountSleeplessNightWhenSleepCrossesYearBoundary() {
+        LocalDateTime start = LocalDateTime.of(2025, 12, 31, 23, 0);
+        LocalDateTime end = start.plusHours(7);
+
+        List<SleepingSession> sessions = List.of(
+                new SleepingSession(start, end, SleepQuality.GOOD)
+        );
+
+        SleepAnalysisResult<Long> result = function.apply(sessions);
+
+        assertEquals(0L, result.getResult());
+    }
+
+    @Test
+    public void shouldCountMissingNightsInsideDateRange() {
+        LocalDateTime start = LocalDateTime.of(2025, 12, 20, 23, 10);
+        LocalDateTime end = start.plusHours(7);
+        LocalDateTime start1 = LocalDateTime.of(2025, 12, 22, 22, 30);
+        LocalDateTime end1 = start1.plusHours(7);
+
+        List<SleepingSession> sessions = List.of(
+                new SleepingSession(start, end, SleepQuality.GOOD),
+                new SleepingSession(start1, end1, SleepQuality.GOOD)
+        );
+
+        SleepAnalysisResult<Long> result = function.apply(sessions);
+
+        assertEquals(1L, result.getResult());
+        assertEquals(LocalDate.of(2025, 12, 20), sessions.get(0).getSleepNightDate());
+        assertEquals(LocalDate.of(2025, 12, 22), sessions.get(1).getSleepNightDate());
+    }
+
+    @Test
+    public void shouldNotLoseFirstNightIfFirstRecordAfterMidnight() {
+        LocalDateTime start = LocalDateTime.of(2024, 2, 2, 0, 40);
+        LocalDateTime end = start.plusHours(6);
+
+        List<SleepingSession> sessions = List.of(
+                new SleepingSession(start, end, SleepQuality.GOOD)
+        );
+
+        SleepAnalysisResult<Long> result = function.apply(sessions);
+
+        assertEquals(0L, result.getResult());
+    }
 }

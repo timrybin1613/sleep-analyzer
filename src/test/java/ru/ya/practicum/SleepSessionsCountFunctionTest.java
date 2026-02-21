@@ -3,6 +3,7 @@ package ru.ya.practicum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,6 @@ public class SleepSessionsCountFunctionTest {
 
     @Test
     void shouldReturnOneWhenSingleSleepSessionProvided() {
-
         LocalDateTime startTime = LocalDateTime.of(2024, 1, 1, 0, 0);
         LocalDateTime endTime = startTime.plusSeconds(11);
 
@@ -35,7 +35,6 @@ public class SleepSessionsCountFunctionTest {
 
     @Test
     void shouldReturnCorrectCountWhenMultipleSleepSessionsProvided() {
-
         LocalDateTime startTime = LocalDateTime.of(2024, 1, 1, 1, 0);
         LocalDateTime endTime = startTime.plusSeconds(11);
         LocalDateTime startTime1 = LocalDateTime.of(2024, 1, 1, 2, 0);
@@ -58,12 +57,11 @@ public class SleepSessionsCountFunctionTest {
 
     @Test
     void shouldReturnZeroWhenNoSleepSessionsProvided() {
-        SleepSessionsCountFunction sleepSessionsCountFunction = new SleepSessionsCountFunction();
         List<SleepingSession> sleepingSessions = new ArrayList<>();
 
         SleepAnalysisResult<Long> expectedResult = new SleepAnalysisResult<>(0L,
                 "Функция по подсчету общего количества сессий сна");
-        SleepAnalysisResult<Long> actualResult = sleepSessionsCountFunction.apply(sleepingSessions);
+        SleepAnalysisResult<Long> actualResult = function.apply(sleepingSessions);
 
         assertEquals(expectedResult, actualResult);
     }
